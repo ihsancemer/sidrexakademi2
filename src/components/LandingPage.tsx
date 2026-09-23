@@ -66,37 +66,11 @@ export default function LandingPage({ products, profile, sections, settings, faq
   return (
     <div className="min-h-screen bg-white font-sans text-[#0b2545] selection:bg-[#58b09c] selection:text-white">
       {/* HEADER */}
-      {profile ? (
-        <Header 
-          profile={profile} 
-          searchQuery="" 
-          onSearchChange={() => {}} 
-        />
-      ) : (
-        <header className="absolute top-0 w-full z-50">
-          {/* Top bar */}
-          <div className="bg-[#0b2545] text-white py-1 px-4 sm:px-8 text-xs flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <span className="opacity-80">Üye olanlar için giriş paneli</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="/login" className="hover:text-[#58b09c] transition-colors">Giriş Yap</Link>
-              <span className="opacity-40">|</span>
-              <Link href="/register" className="hover:text-[#58b09c] transition-colors">Kayıt Ol</Link>
-            </div>
-          </div>
-          
-          {/* Main Navbar */}
-          <div className="px-4 sm:px-8 py-4 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold text-xl">
-                S
-              </div>
-              <span className="text-white font-bold text-xl tracking-tight">Sidrex Akademi</span>
-            </div>
-          </div>
-        </header>
-      )}
+      <Header 
+        profile={profile || null} 
+        searchQuery="" 
+        onSearchChange={() => {}} 
+      />
 
       {/* HERO SECTION */}
       <section className="relative h-[80vh] min-h-[500px] flex items-center justify-center overflow-hidden">

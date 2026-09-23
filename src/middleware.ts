@@ -107,10 +107,9 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/register');
-  const isPublicPage = pathname === '/' || isAuthPage;
 
-  // If user is not logged in and not on a public page, redirect to login
-  if (!user && !isPublicPage) {
+  // If user is not logged in and not on auth page, redirect to login
+  if (!user && !isAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
