@@ -145,7 +145,9 @@ CREATE TABLE IF NOT EXISTS public.product_videos (
 );
 
 ALTER TABLE public.product_videos ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read access on product_videos" ON public.product_videos;
 CREATE POLICY "Allow public read access on product_videos" ON public.product_videos FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Allow authenticated full access on product_videos" ON public.product_videos;
 CREATE POLICY "Allow authenticated full access on product_videos" ON public.product_videos FOR ALL TO authenticated USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 -- =========================================================
@@ -168,8 +170,11 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
 );
 
 ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Site settings viewable by everyone." ON public.site_settings;
 CREATE POLICY "Site settings viewable by everyone." ON public.site_settings FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Site settings updatable by admin only." ON public.site_settings;
 CREATE POLICY "Site settings updatable by admin only." ON public.site_settings FOR UPDATE USING (auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin'));
+DROP POLICY IF EXISTS "Site settings insertable by admin only." ON public.site_settings;
 CREATE POLICY "Site settings insertable by admin only." ON public.site_settings FOR INSERT WITH CHECK (auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin'));
 
 INSERT INTO public.site_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
@@ -187,9 +192,13 @@ CREATE TABLE IF NOT EXISTS public.faqs (
 );
 
 ALTER TABLE public.faqs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Faqs viewable by everyone." ON public.faqs;
 CREATE POLICY "Faqs viewable by everyone." ON public.faqs FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Faqs insertable by admin only." ON public.faqs;
 CREATE POLICY "Faqs insertable by admin only." ON public.faqs FOR INSERT WITH CHECK (auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin'));
+DROP POLICY IF EXISTS "Faqs updatable by admin only." ON public.faqs;
 CREATE POLICY "Faqs updatable by admin only." ON public.faqs FOR UPDATE USING (auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin'));
+DROP POLICY IF EXISTS "Faqs deletable by admin only." ON public.faqs;
 CREATE POLICY "Faqs deletable by admin only." ON public.faqs FOR DELETE USING (auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin'));
 
 -- =========================================================
@@ -213,16 +222,16 @@ VALUES
   ('c8000000-0000-0000-0000-000000000008', 'Fonksiyonel Ä°Ã§ecekler', 'fonksiyonel-icecekler', 8, true)
 ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, sort_order = EXCLUDED.sort_order;
 
--- 9. SIDREX GERÇEK ORÝJÝNAL ÜRÜNLERÝ (SHOPIFY CDN GÖRSELLERÝ ÝLE)
+-- 9. SIDREX GERï¿½EK ORï¿½Jï¿½NAL ï¿½Rï¿½NLERï¿½ (SHOPIFY CDN Gï¿½RSELLERï¿½ ï¿½LE)
 INSERT INTO public.products (section_id, title, slug, description, specs, video_type, video_url, thumbnail_url, is_published)
 VALUES 
-  -- Özel Takviyeler (Electrolyte Balance & Slm-X)
+  -- ï¿½zel Takviyeler (Electrolyte Balance & Slm-X)
   (
     'c7000000-0000-0000-0000-000000000007',
     'Electrolyte Balance',
     'electrolyte-balance',
-    'Sidrex® Electrolyte Balance; pembe Himalaya deniz tuzu, 5’li elektrolit kompleksi, C, B6 ve B12 vitaminleri ile zenginleþtirildi. Bu özel formül; modern bilimin gücünü lezzetli ve pratik bir içecekle buluþturuyor.',
-    '{"Form": "Stick Saþe", "Gramaj": "30 Saþe", "Özellikler": "Þekersiz, Vegan, Glütensiz, Koruyucu Ýçermez", "Fiyat": "549.00 TL", "SKU": "152-SDRX-ELT", "Kullaným Þekli": "Günde 1 stick saþeyi 500 mL su ile karýþtýrarak tüketiniz."}'::jsonb,
+    'Sidrexï¿½ Electrolyte Balance; pembe Himalaya deniz tuzu, 5ï¿½li elektrolit kompleksi, C, B6 ve B12 vitaminleri ile zenginleï¿½tirildi. Bu ï¿½zel formï¿½l; modern bilimin gï¿½cï¿½nï¿½ lezzetli ve pratik bir iï¿½ecekle buluï¿½turuyor.',
+    '{"Form": "Stick Saï¿½e", "Gramaj": "30 Saï¿½e", "ï¿½zellikler": "ï¿½ekersiz, Vegan, Glï¿½tensiz, Koruyucu ï¿½ï¿½ermez", "Fiyat": "549.00 TL", "SKU": "152-SDRX-ELT", "Kullanï¿½m ï¿½ekli": "Gï¿½nde 1 stick saï¿½eyi 500 mL su ile karï¿½ï¿½tï¿½rarak tï¿½ketiniz."}'::jsonb,
     'youtube',
     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     'https://cdn.shopify.com/s/files/1/0767/8653/2540/files/elektrolit.jpg?v=1787745530',
@@ -230,10 +239,10 @@ VALUES
   ),
   (
     'c7000000-0000-0000-0000-000000000007',
-    'Slm-X | Takviye Edici Gýda',
+    'Slm-X | Takviye Edici Gï¿½da',
     'slm-x',
-    'Sidrex® Slm-X; bromelain, CLA, L-karnitin, inülin ve yeþil çay ekstresi baþta olmak üzere 7 bileþenli formülüyle geliþtirilmiþ, ananas aromalý saþe takviyedir.',
-    '{"Form": "Saþe", "Gramaj": "30 Saþe", "Özellikler": "Yapay Boya Yok, Koruyucusuz, Ananas Aromalý", "Fiyat": "1.890.00 TL", "SKU": "153-SDRX-SLMX", "Kullaným Þekli": "Günde 1 saþe suda çözündürülerek tüketilir."}'::jsonb,
+    'Sidrexï¿½ Slm-X; bromelain, CLA, L-karnitin, inï¿½lin ve yeï¿½il ï¿½ay ekstresi baï¿½ta olmak ï¿½zere 7 bileï¿½enli formï¿½lï¿½yle geliï¿½tirilmiï¿½, ananas aromalï¿½ saï¿½e takviyedir.',
+    '{"Form": "Saï¿½e", "Gramaj": "30 Saï¿½e", "ï¿½zellikler": "Yapay Boya Yok, Koruyucusuz, Ananas Aromalï¿½", "Fiyat": "1.890.00 TL", "SKU": "153-SDRX-SLMX", "Kullanï¿½m ï¿½ekli": "Gï¿½nde 1 saï¿½e suda ï¿½ï¿½zï¿½ndï¿½rï¿½lerek tï¿½ketilir."}'::jsonb,
     'vimeo',
     'https://vimeo.com/76979871',
     'https://cdn.shopify.com/s/files/1/0767/8653/2540/files/slim-x-1_08bb1613-bf0e-4925-81f3-73158563ac12.png?v=1778613318',
@@ -245,8 +254,8 @@ VALUES
     'c4000000-0000-0000-0000-000000000004',
     'B12 Complex B12, B1, B2, B6 ve Folik Asit',
     'b12-complex-b12-b1-b2-b6-ve-folik-asit',
-    'B12, B1, B2, B6 vitaminleri ve aktif folik asit içeriðiyle enerji oluþum metabolizmasýna katkýda bulunur, yorgunluk ve bitkinliði azaltmaya yardýmcý olur.',
-    '{"Form": "Damla / Sprey", "Gramaj": "30 ml", "Özellikler": "Þekersiz, Yapay Boya Ýçermez", "Fiyat": "500.00 TL", "SKU": "152-SDRX-B12", "Kullaným Þekli": "Günde 1 puff dil altýna püskürtülür."}'::jsonb,
+    'B12, B1, B2, B6 vitaminleri ve aktif folik asit iï¿½eriï¿½iyle enerji oluï¿½um metabolizmasï¿½na katkï¿½da bulunur, yorgunluk ve bitkinliï¿½i azaltmaya yardï¿½mcï¿½ olur.',
+    '{"Form": "Damla / Sprey", "Gramaj": "30 ml", "ï¿½zellikler": "ï¿½ekersiz, Yapay Boya ï¿½ï¿½ermez", "Fiyat": "500.00 TL", "SKU": "152-SDRX-B12", "Kullanï¿½m ï¿½ekli": "Gï¿½nde 1 puff dil altï¿½na pï¿½skï¿½rtï¿½lï¿½r."}'::jsonb,
     'youtube',
     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     'https://cdn.shopify.com/s/files/1/0767/8653/2540/files/b12-complex-2.jpg?v=1781872183',
@@ -254,23 +263,23 @@ VALUES
   ),
   (
     'c4000000-0000-0000-0000-000000000004',
-    'Lipo Iron Complex | Takviye Edici Gýda',
+    'Lipo Iron Complex | Takviye Edici Gï¿½da',
     'lipo-iron-complex',
-    'Lipozomal mikroenkapsüle Lipofer® demir, C vitamini, aktif folat ve B vitaminleri ile mide hassasiyeti ve kabýzlýk yapmayan yüksek emilimli demir.',
-    '{"Form": "Kapsül", "Gramaj": "30 Kapsül", "Özellikler": "Vegan, TiO2 Ýçermez, GÝS Hassasiyeti Yapmaz", "Fiyat": "900.00 TL", "SKU": "153-SDRX-LIPO", "Kullaným Þekli": "Günde 1 kapsül aç karnýna su ile."}'::jsonb,
+    'Lipozomal mikroenkapsï¿½le Lipoferï¿½ demir, C vitamini, aktif folat ve B vitaminleri ile mide hassasiyeti ve kabï¿½zlï¿½k yapmayan yï¿½ksek emilimli demir.',
+    '{"Form": "Kapsï¿½l", "Gramaj": "30 Kapsï¿½l", "ï¿½zellikler": "Vegan, TiO2 ï¿½ï¿½ermez, Gï¿½S Hassasiyeti Yapmaz", "Fiyat": "900.00 TL", "SKU": "153-SDRX-LIPO", "Kullanï¿½m ï¿½ekli": "Gï¿½nde 1 kapsï¿½l aï¿½ karnï¿½na su ile."}'::jsonb,
     'youtube',
     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     'https://cdn.shopify.com/s/files/1/0767/8653/2540/files/lipo-iron_8e4bbf96-fdd3-4f84-850c-b8f5e7fecb30.jpg?v=1779742716',
     true
   ),
 
-  -- Çocuk Ürünleri
+  -- ï¿½ocuk ï¿½rï¿½nleri
   (
     'c5000000-0000-0000-0000-000000000005',
     'B12 Complex Kids B12, B1, B2, B6 ve Folik Asit',
     'b12-complex-kids',
-    'Çocuklarýn zihinsel ve fiziksel geliþimini desteklemek üzere geliþtirilmiþ B12, B1, B2, B6 vitaminleri ve folik asit kompleksi.',
-    '{"Form": "Damla", "Gramaj": "30 ml", "Özellikler": "Þekersiz, Çocuklara Özel Dozaj", "Fiyat": "490.00 TL", "SKU": "152-SDRX-B12KIDS", "Kullaným Þekli": "Çocuklar için günde 1 damla/puff."}'::jsonb,
+    'ï¿½ocuklarï¿½n zihinsel ve fiziksel geliï¿½imini desteklemek ï¿½zere geliï¿½tirilmiï¿½ B12, B1, B2, B6 vitaminleri ve folik asit kompleksi.',
+    '{"Form": "Damla", "Gramaj": "30 ml", "ï¿½zellikler": "ï¿½ekersiz, ï¿½ocuklara ï¿½zel Dozaj", "Fiyat": "490.00 TL", "SKU": "152-SDRX-B12KIDS", "Kullanï¿½m ï¿½ekli": "ï¿½ocuklar iï¿½in gï¿½nde 1 damla/puff."}'::jsonb,
     'vimeo',
     'https://vimeo.com/76979871',
     'https://cdn.shopify.com/s/files/1/0767/8653/2540/files/b12-complex-kids-1_fb9c56a6-360a-43a8-b264-4f646679881b.jpg?v=1782116848',
@@ -280,21 +289,21 @@ VALUES
     'c5000000-0000-0000-0000-000000000005',
     'Lipo Iron Kids Damla',
     'lipo-iron-kids',
-    'Çocuklarýn günlük demir ihtiyacýný karþýlayan, diþ lekelenmesi ve tat rahatsýzlýðý yapmayan lezzetli lipozomal damla formu.',
-    '{"Form": "Damla", "Gramaj": "30 ml", "Özellikler": "Diþ Leke Yapmaz, Çocuk Güvenlikli Kapak", "Fiyat": "650.00 TL", "SKU": "152-SDRX-LPKIDS", "Kullaným Þekli": "Günde 1 ml damla doðrudan veya meyve suyuna eklenir."}'::jsonb,
+    'ï¿½ocuklarï¿½n gï¿½nlï¿½k demir ihtiyacï¿½nï¿½ karï¿½ï¿½layan, diï¿½ lekelenmesi ve tat rahatsï¿½zlï¿½ï¿½ï¿½ yapmayan lezzetli lipozomal damla formu.',
+    '{"Form": "Damla", "Gramaj": "30 ml", "ï¿½zellikler": "Diï¿½ Leke Yapmaz, ï¿½ocuk Gï¿½venlikli Kapak", "Fiyat": "650.00 TL", "SKU": "152-SDRX-LPKIDS", "Kullanï¿½m ï¿½ekli": "Gï¿½nde 1 ml damla doï¿½rudan veya meyve suyuna eklenir."}'::jsonb,
     'youtube',
     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     'https://cdn.shopify.com/s/files/1/0767/8653/2540/files/lipo-iron-2_d097a81e-9c99-4739-ab9e-f52dd38bec8b.png?v=1786701578',
     true
   ),
 
-  -- Çocuk Setleri
+  -- ï¿½ocuk Setleri
   (
     'c5000000-0000-0000-0000-000000000005',
-    'Çocuk Mevsim Geçiþi Seti',
+    'ï¿½ocuk Mevsim Geï¿½iï¿½i Seti',
     'cocuk-mevsim-gecis-seti',
-    'Mevsim deðiþikliklerinde çocuklarýn direncini korumak için tasarlanmýþ Imuntus Kids ve D3K2 takviye seti.',
-    '{"Form": "Set", "Ýçerik": "Imuntus Kids + Vitamin D3K2 Kids", "Özellikler": "Avantajlý Paket, %10 Ýndirimli", "Fiyat": "1.149.00 TL", "SKU": "SET-ALERJISET", "Kullaným Þekli": "Günlük 1 saþe ve 1 damla."}'::jsonb,
+    'Mevsim deï¿½iï¿½ikliklerinde ï¿½ocuklarï¿½n direncini korumak iï¿½in tasarlanmï¿½ï¿½ Imuntus Kids ve D3K2 takviye seti.',
+    '{"Form": "Set", "ï¿½ï¿½erik": "Imuntus Kids + Vitamin D3K2 Kids", "ï¿½zellikler": "Avantajlï¿½ Paket, %10 ï¿½ndirimli", "Fiyat": "1.149.00 TL", "SKU": "SET-ALERJISET", "Kullanï¿½m ï¿½ekli": "Gï¿½nlï¿½k 1 saï¿½e ve 1 damla."}'::jsonb,
     'youtube',
     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     'https://cdn.shopify.com/s/files/1/0767/8653/2540/files/allergy-set-kids_970fd0c3-9c2d-4da1-acd5-7f61dc38e02d.jpg?v=1778644243',
@@ -304,21 +313,21 @@ VALUES
     'c5000000-0000-0000-0000-000000000005',
     'Happy Tummies Set',
     'happy-tummies-set',
-    'Çocuklarda sindirim ve mide konforu saðlayan probiyotik lif ve multivitamin ikili takviye paketi.',
-    '{"Form": "Set", "Ýçerik": "Colovita Kids + B12 Complex Kids", "Özellikler": "Sindirim Dostu, Doðal Tat", "Fiyat": "1.265.00 TL", "SKU": "SET-DIGESTSETKIDS", "Kullaným Þekli": "Günde 1 saþe ve 1 damla."}'::jsonb,
+    'ï¿½ocuklarda sindirim ve mide konforu saï¿½layan probiyotik lif ve multivitamin ikili takviye paketi.',
+    '{"Form": "Set", "ï¿½ï¿½erik": "Colovita Kids + B12 Complex Kids", "ï¿½zellikler": "Sindirim Dostu, Doï¿½al Tat", "Fiyat": "1.265.00 TL", "SKU": "SET-DIGESTSETKIDS", "Kullanï¿½m ï¿½ekli": "Gï¿½nde 1 saï¿½e ve 1 damla."}'::jsonb,
     'vimeo',
     'https://vimeo.com/76979871',
     'https://cdn.shopify.com/s/files/1/0767/8653/2540/files/digest-set-kids_71012669-bdd0-4978-93e6-3495b597fb83.jpg?v=1778644257',
     true
   ),
 
-  -- Baðýþýklýk Desteði
+  -- Baï¿½ï¿½ï¿½ï¿½klï¿½k Desteï¿½i
   (
     'c2000000-0000-0000-0000-000000000002',
-    'Ýmuntus | Bitkisel Takviye Edici Gýda',
+    'ï¿½muntus | Bitkisel Takviye Edici Gï¿½da',
     'imuntus-bitkisel',
-    'Zahter, zencefil, ardýç, karabaþ otu, çörek otu yaðý, C vitamini ve Çinko içeren Anadolu bitkileri destekli þurup.',
-    '{"Form": "Þurup", "Gramaj": "150 ml", "Özellikler": "Þekersiz, Yapay Boya ve Koruyucu Ýçermez", "Fiyat": "500.00 TL", "SKU": "153-SDRX-IM", "Kullaným Þekli": "Günde 1 ölçek (10 ml) yemekten sonra."}'::jsonb,
+    'Zahter, zencefil, ardï¿½ï¿½, karabaï¿½ otu, ï¿½ï¿½rek otu yaï¿½ï¿½, C vitamini ve ï¿½inko iï¿½eren Anadolu bitkileri destekli ï¿½urup.',
+    '{"Form": "ï¿½urup", "Gramaj": "150 ml", "ï¿½zellikler": "ï¿½ekersiz, Yapay Boya ve Koruyucu ï¿½ï¿½ermez", "Fiyat": "500.00 TL", "SKU": "153-SDRX-IM", "Kullanï¿½m ï¿½ekli": "Gï¿½nde 1 ï¿½lï¿½ek (10 ml) yemekten sonra."}'::jsonb,
     'youtube',
     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     'https://cdn.shopify.com/s/files/1/0767/8653/2540/files/imuntus-1_6b6dc4ab-345e-4745-a971-b0c1a09a86ac.jpg?v=1778613159',
@@ -330,21 +339,21 @@ VALUES
     'c1000000-0000-0000-0000-000000000001',
     'Collagen Glow Complex',
     'collagen-glow-complex',
-    'Tip 1 & Tip 3 hidrolize kolajen peptidleri, hyaluronik asit, C vitamini ve biyotin ile cilt parlaklýðý ve esnekliði için özel formül.',
-    '{"Form": "Saþe", "Gramaj": "30 Saþe", "Özellikler": "Þekersiz, Glütensiz, Tatlandýrýcý Ýçermez", "Fiyat": "1.450.00 TL", "SKU": "SX-COL-GLOW", "Kullaným Þekli": "Günde 1 saþeyi 200 ml suda çözdürerek tüketiniz."}'::jsonb,
+    'Tip 1 & Tip 3 hidrolize kolajen peptidleri, hyaluronik asit, C vitamini ve biyotin ile cilt parlaklï¿½ï¿½ï¿½ ve esnekliï¿½i iï¿½in ï¿½zel formï¿½l.',
+    '{"Form": "Saï¿½e", "Gramaj": "30 Saï¿½e", "ï¿½zellikler": "ï¿½ekersiz, Glï¿½tensiz, Tatlandï¿½rï¿½cï¿½ ï¿½ï¿½ermez", "Fiyat": "1.450.00 TL", "SKU": "SX-COL-GLOW", "Kullanï¿½m ï¿½ekli": "Gï¿½nde 1 saï¿½eyi 200 ml suda ï¿½ï¿½zdï¿½rerek tï¿½ketiniz."}'::jsonb,
     'youtube',
     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=1200&auto=format&fit=crop',
     true
   ),
 
-  -- Bitkisel Ürünler
+  -- Bitkisel ï¿½rï¿½nler
   (
     'c3000000-0000-0000-0000-000000000003',
     'Milk Thistle Complex',
     'milk-thistle-complex',
-    'Devedikeni ekstratý (Silymarin), enginar ve karahindiba kökü ile karaciðer detoksu ve sindirim saðlýðý takviyesi.',
-    '{"Form": "Kapsül", "Gramaj": "60 Bitkisel Kapsül", "Özellikler": "Vegan, GDO Ýçermez", "Fiyat": "750.00 TL", "SKU": "SX-MILK-THISTLE", "Kullaným Þekli": "Günde 1-2 kapsül yemeklerden önce."}'::jsonb,
+    'Devedikeni ekstratï¿½ (Silymarin), enginar ve karahindiba kï¿½kï¿½ ile karaciï¿½er detoksu ve sindirim saï¿½lï¿½ï¿½ï¿½ takviyesi.',
+    '{"Form": "Kapsï¿½l", "Gramaj": "60 Bitkisel Kapsï¿½l", "ï¿½zellikler": "Vegan, GDO ï¿½ï¿½ermez", "Fiyat": "750.00 TL", "SKU": "SX-MILK-THISTLE", "Kullanï¿½m ï¿½ekli": "Gï¿½nde 1-2 kapsï¿½l yemeklerden ï¿½nce."}'::jsonb,
     'youtube',
     'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     'https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?q=80&w=1200&auto=format&fit=crop',
